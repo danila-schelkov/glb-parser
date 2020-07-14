@@ -6,7 +6,9 @@ from utils.reader import Reader
 
 class Glb(Reader):
     def __init__(self, filename):
-        self.json_filename = ''.join(filename.split('.')[:-1]) + '.json'
+        self.filename = ''.join(filename.split('.')[:-1])
+        self.json_data = b''
+        self.bin_data = b''
 
         with open(f'glb/{filename}', 'rb') as file:
             self.data = file.read()
@@ -24,21 +26,25 @@ class Glb(Reader):
 
                 json_length = self.readUInt32()
                 self.read(4)  # json_magic
-                json_data = self.readChar(json_length)
+                self.json_data = self.readChar(json_length)
 
-                dump(loads(json_data), open(f'json/{self.json_filename}', 'w'), indent=4)
+                dump(loads(self.json_data), open(f'parsed/{self.filename}.parsed', 'w'), indent=4)
 
                 bin_length = self.readUInt32()
+                print(bin_length)
                 self.read(4)  # bin_magic
-                self.read(bin_length)  # bin_data
+                self.bin_data = self.read(bin_length)
+
+                open(f'parsed/{self.filename}.bin', 'wb').write(self.bin_data)
 
 
+# Test
 if __name__ == '__main__':
     if not os.path.exists('glb'):
         os.mkdir('glb')
 
-    if not os.path.exists('json'):
-        os.mkdir('json')
+    if not os.path.exists('parsed'):
+        os.mkdir('parsed')
 
     for filename in os.listdir('glb'):
         glb = Glb(filename)
