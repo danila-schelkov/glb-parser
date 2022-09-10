@@ -1,0 +1,9 @@
+# Project directories
+/.idea/
+
+# Script directories
+/parsed/
+/glb/
+/obj/
+
+*.pyc
